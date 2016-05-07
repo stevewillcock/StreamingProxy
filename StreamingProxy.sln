@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{725FB161-23D0-4E0E-9FD9-DEC20E1E2290}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6E47CCB7-442D-4DC4-95F2-DC95432905F3}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "StreamingProxy", "src\StreamingProxy\StreamingProxy.xproj", "{36C2A790-1C73-421E-BFDB-4424DF059DB1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36C2A790-1C73-421E-BFDB-4424DF059DB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36C2A790-1C73-421E-BFDB-4424DF059DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36C2A790-1C73-421E-BFDB-4424DF059DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36C2A790-1C73-421E-BFDB-4424DF059DB1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{36C2A790-1C73-421E-BFDB-4424DF059DB1} = {725FB161-23D0-4E0E-9FD9-DEC20E1E2290}
+	EndGlobalSection
+EndGlobal
