@@ -1,5 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Security.Policy;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
@@ -8,6 +12,8 @@ using Org.BouncyCastle.Bcpg;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Asn1;
 
 namespace StreamingProxy
 {
@@ -17,8 +23,10 @@ namespace StreamingProxy
         {
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddConsole(minLevel:LogLevel.Verbose);
+
             app.UseIISPlatformHandler();
 
             app.Run(async context =>
@@ -39,26 +47,36 @@ namespace StreamingProxy
             return t;
         }
 
-        private static Stream Encrypt(Stream s, int length) => new PgpEncryptedDataGenerator(SymmetricKeyAlgorithmTag.Aes256, true)
+        private static Task<HttpResponseMessage> GetUrl(string url) => new System.Net.Http.HttpClient().GetAsync(url);
+
+        private static Stream Encrypt(Stream s, long length) => new PgpEncryptedDataGenerator(SymmetricKeyAlgorithmTag.Aes256, true)
             .With(x => x.AddMethod("password_here".ToCharArray(), HashAlgorithmTag.MD5))
             .Open(s, length);
 
         private static Stream Compress(Stream s) => new PgpCompressedDataGenerator(CompressionAlgorithmTag.Zip).Open(s);
-        private static Stream LiteralOutput(Stream s, long length) => new PgpLiteralDataGenerator().Open(s, 'a', "bob", length, DateTime.Now);
+        private static Stream LiteralOutput(Stream s, long length) => new PgpLiteralDataGenerator().Open(s, 'a', "bob", length, DateTime.Now); // TODO - params 2 and 3 here are nonsense
 
         public static async Task EncryptResponseStream(HttpContext context, bool armour)
         {
-            var bytes = Encoding.UTF8.GetBytes("This is a test This is a test This is a test This is a test This is a test");
+            var url = context.Request.Query["url"];
+            Console.WriteLine(url);
+            var httpResponseMessage = await GetUrl(url);
+            if (!httpResponseMessage.Content.Headers.ContentLength.HasValue)
+            {
+                throw new Exception("The response did not contain a content length");
+            }
+
+            var contentLength = httpResponseMessage.Content.Headers.ContentLength.Value;
 
             var responseStream = context.Response.Body;
 
             if (armour) responseStream = new ArmoredOutputStream(responseStream);
 
-            using (var encryptedStream = Encrypt(responseStream, bytes.Length))
+            using (var encryptedStream = Encrypt(responseStream, contentLength))
             using (var compressedStream = Compress(encryptedStream))
-            using (var literalStream = LiteralOutput(compressedStream, bytes.Length))
+            using (var literalStream = LiteralOutput(compressedStream, contentLength))
             {
-                await literalStream.WriteAsync(bytes, 0, bytes.Length);
+                await httpResponseMessage.Content.CopyToAsync(literalStream);
                 if (armour) literalStream.Close();
             }
         }
