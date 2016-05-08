@@ -1,19 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Bcpg;
 using Org.BouncyCastle.Bcpg.OpenPgp;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Asn1;
 
 namespace StreamingProxy
 {
@@ -25,7 +20,7 @@ namespace StreamingProxy
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(minLevel:LogLevel.Verbose);
+            loggerFactory.AddConsole(minLevel: LogLevel.Verbose);
 
             app.UseIISPlatformHandler();
 
